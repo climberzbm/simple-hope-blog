@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const AI_BASE_URL = process.env.AI_BASE_URL || 'https://coding.dashscope.aliyuncs.com/v1'
 const AI_API_KEY = process.env.AI_API_KEY || 'sk-sp-bf4797c30fb246898548832bc5bc56ab'
-const AI_MODEL = process.env.AI_MODEL || 'glm-5'
+const AI_MODEL = process.env.AI_MODEL || 'glm-4-flash'  // 使用更快的模型
 
 interface AIMessage {
   role: 'system' | 'user' | 'assistant'
@@ -91,10 +91,10 @@ export async function generateTechArticle(title: string, category: string, tags:
 标签：${tags.join(', ')}
 
 要求：
-1. 文章长度 1500-2500 字
-2. 包含 2-3 个代码示例
-3. 有背景介绍、核心概念、实践技巧、常见问题等小节
-4. 文章末尾生成一段 50-100 字的摘要，用 "---EXCERPT---" 分隔
+1. 文章长度 800-1200 字
+2. 包含 1-2 个代码示例
+3. 有背景介绍、核心要点、总结
+4. 文章末尾用一行写摘要(50字内)，用 "---EXCERPT---" 分隔
 
 现在开始写作：`
 
@@ -141,10 +141,10 @@ export async function generateLifeArticle(title: string): Promise<{
   const prompt = `请写一篇题为 "${title}" 的生活随笔。
 
 要求：
-1. 文章长度 800-1500 字
-2. 有个人经历和感悟
+1. 文章长度 500-800 字
+2. 有个人感悟
 3. 真实不做作
-4. 文章末尾生成一段 50-80 字的摘要，用 "---EXCERPT---" 分隔
+4. 文章末尾用一行写摘要(50字内)，用 "---EXCERPT---" 分隔
 
 现在开始写作：`
 
