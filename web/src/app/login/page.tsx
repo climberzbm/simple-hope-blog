@@ -18,14 +18,17 @@ export default function LoginPage() {
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    const data = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      ...( !isLogin && { username: formData.get('username') as string }),
-    }
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
 
     try {
-      const res: any = isLogin ? await login(data) : await register(data)
+      let res: any
+      if (isLogin) {
+        res = await login({ email, password })
+      } else {
+        const username = formData.get('username') as string
+        res = await register({ email, password, username })
+      }
       setAuth(res.data.user, res.data.token)
       router.push('/')
     } catch (err: any) {
@@ -76,16 +79,14 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-red-500 text-sm">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
+            {loading ? '处理中...' : isLogin ? '登录' : '注册'}
           </button>
         </form>
 

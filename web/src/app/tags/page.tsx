@@ -36,7 +36,7 @@ export default async function TagsPage() {
       {/* 文章列表 */}
       <div className="space-y-8">
         {groupedPosts
-          .filter((t) => t.posts.length > 0)
+          .filter((t: any) => t.posts.length > 0)
           .map((tag: any) => (
             <section key={tag.id}>
               <h2 className="text-xl font-semibold mb-4">#{tag.name}</h2>

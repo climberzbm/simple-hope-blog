@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth'
-import { MoonIcon, SunIcon, UserIcon } from './Icons'
+import { MoonIcon, SunIcon } from './Icons'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -31,6 +31,7 @@ export default function Header() {
           <Link href="/categories" className="hover:text-blue-600 transition-colors">分类</Link>
           <Link href="/tags" className="hover:text-blue-600 transition-colors">标签</Link>
           <Link href="/archive" className="hover:text-blue-600 transition-colors">归档</Link>
+          <Link href="/games" className="hover:text-blue-600 transition-colors">游戏</Link>
           <Link href="/about" className="hover:text-blue-600 transition-colors">关于</Link>
         </div>
 
