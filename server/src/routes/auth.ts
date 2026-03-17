@@ -1,6 +1,7 @@
 import Router from 'koa-router'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import type ms from 'ms'
 import { prisma } from '../lib/prisma'
 import { Response } from '../lib/response'
 import { validate } from '../middleware/validate'
@@ -9,7 +10,7 @@ import { registerSchema, loginSchema, changePasswordSchema, updateProfileSchema 
 
 const router = new Router()
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret'
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
+const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '7d') as ms.StringValue
 
 /**
  * 用户注册

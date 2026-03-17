@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Table, Upload, Button, message, Popconfirm, Typography, Image } from 'antd'
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons'
+import { UploadOutlined } from '@ant-design/icons'
 import { getMedia, uploadImage, deleteMedia } from '@/lib/request'
 
 export default function Media() {

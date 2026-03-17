@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Typography, Space } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '@/lib/request'
 
 interface Category {

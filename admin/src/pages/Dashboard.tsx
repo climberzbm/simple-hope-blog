@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Card, Row, Col, Statistic, Table, Typography, Tag } from 'antd'
+import { Card, Row, Col, Statistic, Table, Typography } from 'antd'
 import {
   FileTextOutlined,
   MessageOutlined,
-  UserOutlined,
   EyeOutlined,
   LikeOutlined,
 } from '@ant-design/icons'

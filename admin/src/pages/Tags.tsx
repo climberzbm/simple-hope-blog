@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Typography, Tag } from 'antd'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import { getTags, createTag, deleteTag } from '@/lib/request'
 
 interface Tag {

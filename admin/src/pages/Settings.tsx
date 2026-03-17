@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Form, Input, Button, Card, message, Typography, Divider } from 'antd'
+import { Form, Input, Button, Card, message, Typography } from 'antd'
 import { getSettings, updateSettings, getAbout, updateAbout } from '@/lib/request'
 
 const { TextArea } = Input

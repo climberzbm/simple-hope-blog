@@ -1,4 +1,5 @@
 import Router from 'koa-router'
+import { prisma } from '../lib/prisma'
 import { publishArticle } from '../jobs/publish-article'
 import { checkAndReplyComments } from '../jobs/check-comments'
 
@@ -42,12 +43,13 @@ router.post('/check-comments', validateApiKey, async (ctx) => {
 
 // 定时任务状态
 router.get('/status', validateApiKey, async (ctx) => {
+  const [lastPublish, lastCommentCheck] = await Promise.all([
+    prisma.setting.findUnique({ where: { key: 'last_publish_time' } }),
+    prisma.setting.findUnique({ where: { key: 'last_comment_check' } })
+  ])
   ctx.body = {
     success: true,
-    data: {
-      lastPublish: await ctx.db?.setting?.findUnique({ where: { key: 'last_publish_time' } }),
-      lastCommentCheck: await ctx.db?.setting?.findUnique({ where: { key: 'last_comment_check' } })
-    }
+    data: { lastPublish, lastCommentCheck }
   }
 })
 
