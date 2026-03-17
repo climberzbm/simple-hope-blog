@@ -3,24 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #18181b;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --card: #ffffff;
+  --card-hover: #f4f4f5;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --primary: #60a5fa;
+  --primary-hover: #3b82f6;
+  --muted: #a1a1aa;
+  --border: #27272a;
+  --card: #18181b;
+  --card-hover: #27272a;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 滚动条样式 */
+/* 滚动条 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -28,31 +47,110 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+  background: #888;
+  border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #444;
-}
-
-/* 代码高亮 */
-code[class*="language-"],
-pre[class*="language-"] {
-  color: #f8f8f2;
-  background: none;
-  font-family: 'Fira Code', 'Consolas', Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  text-align: left;
-  white-space: pre;
-  word-spacing: normal;
-  word-break: normal;
-  word-wrap: normal;
-  line-height: 1.6;
-  tab-size: 2;
+  background: #555;
 }
 
 /* 选中文本 */
 ::selection {
-  background: #3b82f6;
+  background: var(--primary);
   color: white;
+}
+
+/* 链接动画 */
+a {
+  transition: color 0.2s ease;
+}
+
+/* 卡片悬停效果 */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮基础样式 */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95;
+}
+
+/* 输入框样式 */
+input, textarea {
+  @apply w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg;
+  @apply bg-white dark:bg-gray-800;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply transition-all duration-200;
+}
+
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+  @apply md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800;
+}
+
+/* 文章卡片 */
+.post-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl overflow-hidden;
+  @apply shadow-sm hover:shadow-md;
+  @apply transition-all duration-200;
+}
+
+/* 标签样式 */
+.tag {
+  @apply px-2 py-1 text-xs rounded-full;
+  @apply bg-gray-100 dark:bg-gray-800;
+  @apply hover:bg-gray-200 dark:hover:bg-gray-700;
+  @apply transition-colors cursor-pointer;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 代码块 */
+.markdown-body pre {
+  @apply my-4 p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto;
+}
+
+.markdown-body code {
+  @apply px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono;
+}
+
+.markdown-body pre code {
+  @apply bg-transparent p-0;
+}
+
+/* 响应式隐藏 */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* 触摸优化 */
+@media (hover: none) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
