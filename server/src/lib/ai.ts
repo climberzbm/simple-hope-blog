@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const AI_BASE_URL = process.env.AI_BASE_URL || 'https://coding.dashscope.aliyuncs.com/v1'
 const AI_API_KEY = process.env.AI_API_KEY || 'sk-sp-bf4797c30fb246898548832bc5bc56ab'
-const AI_MODEL = process.env.AI_MODEL || 'glm-4-flash'  // 使用更快的模型
+const AI_MODEL = process.env.AI_MODEL || 'glm-5'
 
 interface AIMessage {
   role: 'system' | 'user' | 'assistant'
@@ -46,7 +46,7 @@ export async function generateWithAI(
         model: AI_MODEL,
         messages,
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: 2048,
       },
       {
         headers: {
