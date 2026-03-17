@@ -8,6 +8,8 @@ import path from 'path'
 import dotenv from 'dotenv'
 
 import { errorHandler, requestLogger } from './middleware/error'
+import { rateLimit, loginRateLimit } from './middleware/rateLimit'
+import { xssFilter } from './middleware/xss'
 import { logger } from './lib/logger'
 
 // 导入路由
@@ -26,21 +28,36 @@ dotenv.config()
 const app = new Koa()
 const router = new Router()
 
-// 中间件
+// 安全中间件
 app.use(errorHandler)
 app.use(requestLogger)
 app.use(helmet())
+app.use(xssFilter)
+
+// CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: process.env.CORS_ORIGIN?.split(',') || '*',
   credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
 }))
+
+// Body 解析
 app.use(koaBody({
   multipart: true,
   formidable: {
     maxFileSize: 10 * 1024 * 1024, // 10MB
   },
 }))
+
+// 静态文件
 app.use(serve(path.join(__dirname, '../uploads')))
+
+// 全局限流
+app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }))
+
+// 登录限流
+app.use(loginRateLimit({ max: 5, lockTime: 15 * 60 * 1000 }))
 
 // 健康检查
 router.get('/api/health', (ctx) => {
@@ -48,6 +65,7 @@ router.get('/api/health', (ctx) => {
     status: 'ok',
     message: 'Simple Hope Blog API is running',
     timestamp: new Date().toISOString(),
+    version: '1.0.0',
   }
 })
 

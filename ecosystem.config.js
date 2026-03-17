@@ -1,0 +1,50 @@
+module.exports = {
+  apps: [
+    {
+      name: 'simple-hope-blog-server',
+      cwd: '/home/ubuntu/simple-hope-blog/server',
+      script: 'npm',
+      args: 'start',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+      },
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      error_file: '/home/ubuntu/simple-hope-blog/server/logs/error.log',
+      out_file: '/home/ubuntu/simple-hope-blog/server/logs/out.log',
+      log_file: '/home/ubuntu/simple-hope-blog/server/logs/combined.log',
+      time: true,
+    },
+    {
+      name: 'simple-hope-blog-web',
+      cwd: '/home/ubuntu/simple-hope-blog/web',
+      script: 'npm',
+      args: 'start',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+    },
+    {
+      name: 'simple-hope-blog-admin',
+      cwd: '/home/ubuntu/simple-hope-blog/admin',
+      script: 'npm',
+      args: 'run preview',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3002,
+      },
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '500M',
+    },
+  ],
+}
