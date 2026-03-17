@@ -22,6 +22,7 @@ import mediaRoutes from "./routes/media"
 import statsRoutes from "./routes/stats"
 import settingsRoutes from "./routes/settings"
 import proxyRoutes from "./routes/proxy"
+import cronRoutes from "./routes/cron"
 
 dotenv.config()
 
@@ -52,6 +53,7 @@ router.use("/api/media", mediaRoutes.routes())
 router.use("/api/stats", statsRoutes.routes())
 router.use("/api/settings", settingsRoutes.routes())
 router.use("/api/proxy", proxyRoutes.routes())
+router.use("/api/cron", cronRoutes.routes())
 
 app.use(router.routes()).use(router.allowedMethods())
 
