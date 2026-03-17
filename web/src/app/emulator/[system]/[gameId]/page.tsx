@@ -22,8 +22,8 @@ export default function EmulatorGamePage() {
     )
   }
 
-  // 构建 iframe URL（使用 EmulatorJS 的独立页面）
-  const emulatorUrl = `https://demo.emulatorjs.org/?system=${game.system}&rom=${encodeURIComponent(game.romUrl)}&color=3b82f6&lang=zh`
+  // 使用独立 HTML 页面 + URL 参数
+  const emulatorUrl = `/emulator.html?system=${game.system}&rom=${encodeURIComponent(game.romUrl)}`
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -36,11 +36,12 @@ export default function EmulatorGamePage() {
         <p className="text-gray-500 text-sm">{game.description}</p>
       </div>
 
-      {/* 使用 iframe 完全隔离模拟器 */}
-      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+      {/* 使用独立 HTML 隔离模拟器 */}
+      <div className="relative w-full rounded-lg overflow-hidden border-2 border-gray-700" style={{ minHeight: '400px' }}>
         <iframe
           src={emulatorUrl}
-          className="absolute inset-0 w-full h-full rounded-lg border-2 border-gray-700"
+          className="w-full"
+          style={{ height: '70vh', minHeight: '400px' }}
           allow="fullscreen"
           allowFullScreen
         />
@@ -52,7 +53,7 @@ export default function EmulatorGamePage() {
           <span>方向键：移动</span>
           <span>Z：A 键 / X：B 键</span>
           <span>Enter：开始</span>
-          <span>F：全屏</span>
+          <span>Shift：选择</span>
         </div>
       </div>
     </div>

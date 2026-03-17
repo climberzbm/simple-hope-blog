@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>复古游戏模拟器</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #game {
+      max-width: 100%;
+    }
+    .loading {
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  
+  <script>
+    // 从 URL 参数获取配置
+    const params = new URLSearchParams(window.location.search);
+    const system = params.get('system') || 'gb';
+    const rom = params.get('rom');
+    const coreMap = {
+      gb: 'gambatte',
+      nes: 'nestopia',
+      gba: 'mgba',
+      snes: 'snes9x'
+    };
+
+    if (!rom) {
+      document.getElementById('game').innerHTML = '<div class="loading">ROM 参数缺失</div>';
+    } else {
+      // 配置 EmulatorJS
+      window.EJS_player = '#game';
+      window.EJS_core = coreMap[system] || 'gambatte';
+      window.EJS_gameUrl = rom;
+      window.EJS_language = 'zh-CN';
+      window.EJS_color = '#3b82f6';
+      window.EJS_startOnLoaded = true;
+      window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+
+      // 加载脚本
+      const script = document.createElement('script');
+      script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+      script.async = true;
+      script.onerror = function() {
+        document.getElementById('game').innerHTML = '<div class="loading">模拟器加载失败</div>';
+      };
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>
