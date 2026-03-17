@@ -1,0 +1,6 @@
+name: simple-hope-blog
+packages:
+  - 'web'
+  - 'admin'
+  - 'server'
+  - 'shared'

@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  nickname  String?
+  avatar    String?
+  bio       String?   @db.Text
+  role      String    @default("user") // user, admin
+  status    String    @default("active") // active, banned
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  posts     Post[]    @relation("AuthorPosts")
+  comments  Comment[]
+  likes     Like[]
+}
+
+// 文章表
+model Post {
+  id           String     @id @default(cuid())
+  title        String
+  slug         String     @unique
+  content      String     @db.Text
+  excerpt      String?    @db.Text
+  cover        String?
+  status       String     @default("draft") // draft, published
+  viewCount    Int        @default(0)
+  commentCount Int        @default(0)
+  likeCount    Int        @default(0)
+  isTop        Boolean    @default(false)
+  allowComment Boolean    @default(true)
+  publishedAt  DateTime?
+
+  authorId     String
+  author       User       @relation("AuthorPosts", fields: [authorId], references: [id])
+
+  categoryId   String?
+  category     Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  tags         PostTag[]
+  comments     Comment[]
+  likes        Like[]
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+// 分类表
+model Category {
+  id        String   @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+
+  posts     Post[]
+}
+
+// 标签表
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+
+  posts     PostTag[]
+}
+
+// 文章-标签关联表
+model PostTag {
+  postId String
+  tagId  String
+
+  post   Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+// 评论表
+model Comment {
+  id        String    @id @default(cuid())
+  content   String    @db.Text
+  status    String    @default("pending") // pending, approved, spam
+
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([postId, status])
+  @@index([userId])
+}
+
+// 点赞表
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// 媒体表
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  size      Int
+  mimeType  String
+  createdAt DateTime @default(now())
+}
+
+// 站点设置表
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
