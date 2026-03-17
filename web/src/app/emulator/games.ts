@@ -1,38 +1,38 @@
 import Link from 'next/link'
 
-// 使用在线公开的 Homebrew 游戏 ROM（开源/免费）
+// 使用后端代理 ROM URL（解决 CORS）
 const games = [
   {
     id: 'geometrix',
     name: 'Geometrix',
     system: 'gb',
-    description: '几何益智游戏 - 开源免费',
+    description: '几何益智游戏',
     core: 'gambatte',
-    romUrl: 'https://github.com/AntonioND/geometrix/releases/download/v1.0/geometrix.gb',
+    romUrl: '/api/proxy/rom/gb/geometrix',
   },
   {
     id: 'ucity',
     name: 'µCity',
     system: 'gb',
-    description: '城市模拟建造游戏 - 开源免费',
+    description: '城市模拟建造游戏',
     core: 'gambatte',
-    romUrl: 'https://github.com/AntonioND/ucity/releases/download/v1.0/ucity.gb',
+    romUrl: '/api/proxy/rom/gb/ucity',
   },
   {
     id: 'libbet',
     name: 'Libbet Adventures',
     system: 'gb',
-    description: '平台跳跃游戏 - 开源免费',
+    description: '平台跳跃游戏',
     core: 'gambatte',
-    romUrl: 'https://github.com/pinobatch/libbet/releases/download/v0.06/libbet.gb',
+    romUrl: '/api/proxy/rom/gb/libbet',
   },
   {
     id: 'caru',
     name: 'Car.u',
     system: 'gb',
-    description: '赛车游戏 - 开源免费',
+    description: '赛车游戏',
     core: 'gambatte',
-    romUrl: 'https://github.com/Hacktix/caru/releases/download/v1.0.0/Caru.gb',
+    romUrl: '/api/proxy/rom/gb/caru',
   },
 ]
 
