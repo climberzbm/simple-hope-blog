@@ -22,7 +22,6 @@ export default function Header() {
     { href: '/tags', label: '标签' },
     { href: '/archive', label: '归档' },
     { href: '/games', label: '游戏' },
-    { href: '/emulator', label: '复古' },
     { href: '/about', label: '关于' },
   ]
 
