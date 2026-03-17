@@ -1,6 +1,13 @@
-name: simple-hope-blog
 packages:
   - 'web'
   - 'admin'
   - 'server'
   - 'shared'
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  bcrypt: true
+  esbuild: true
+  prisma: true
+  unrs-resolver: true
+name: simple-hope-blog
