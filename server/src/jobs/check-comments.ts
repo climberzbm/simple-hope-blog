@@ -1,26 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { prisma } from '../lib/prisma'
-
-// AI 自动回复生成
-function generateAutoReply(postContent: string, commentContent: string): string {
-  // 基于文章和评论生成回复
-  const replies = [
-    '感谢你的评论！这个问题确实值得深入探讨。',
-    '很高兴看到你的想法，我会在后续文章中继续分享相关内容。',
-    '你提出了一个很好的观点，感谢分享！',
-    '感谢阅读！希望这篇文章对你有所帮助。',
-    '你的反馈很有价值，我会持续改进内容。',
-    '感谢支持！有问题欢迎继续交流。',
-    '这个观点很有意思，感谢你的分享！',
-    '感谢评论，期待与你更多交流！',
-  ]
-  
-  // 根据评论长度选择回复风格
-  if (commentContent.length > 50) {
-    return replies.slice(0, 4)[Math.floor(Math.random() * 4)]
-  }
-  return replies.slice(4)[Math.floor(Math.random() * 4)]
-}
+import { generateCommentReply } from '../lib/ai'
 
 // 检查是否是用户回复用户（非管理员）
 async function isUserReplyToUser(commentId: string): Promise<boolean> {
@@ -88,25 +67,53 @@ export async function checkAndReplyComments() {
         continue
       }
 
-      // 生成自动回复
-      const replyContent = generateAutoReply(comment.post.content, comment.content)
-      
-      // 获取管理员
-      const admin = await prisma.user.findFirst({ where: { role: 'admin' } })
-      if (!admin) continue
+      // 使用 AI 生成回复
+      try {
+        const replyContent = await generateCommentReply(
+          comment.post.title,
+          comment.post.content,
+          comment.content
+        )
+        
+        // 获取管理员
+        const admin = await prisma.user.findFirst({ where: { role: 'admin' } })
+        if (!admin) continue
 
-      // 创建回复
-      await prisma.comment.create({
-        data: {
-          content: replyContent,
-          status: 'approved',
-          postId: comment.postId,
-          userId: admin.id,
-          parentId: comment.id
+        // 创建回复
+        await prisma.comment.create({
+          data: {
+            content: replyContent,
+            status: 'approved',
+            postId: comment.postId,
+            userId: admin.id,
+            parentId: comment.id
+          }
+        })
+
+        console.log(`✅ AI 已回复评论: ${comment.id}`)
+      } catch (aiError) {
+        console.error(`⚠️ AI 回复失败，使用默认回复: ${comment.id}`)
+        
+        // 降级：使用默认回复
+        const defaultReplies = [
+          '感谢你的评论！这个问题确实值得深入探讨。',
+          '很高兴看到你的想法，感谢支持！',
+          '感谢阅读！希望这篇文章对你有所帮助。',
+        ]
+        
+        const admin = await prisma.user.findFirst({ where: { role: 'admin' } })
+        if (admin) {
+          await prisma.comment.create({
+            data: {
+              content: defaultReplies[Math.floor(Math.random() * defaultReplies.length)],
+              status: 'approved',
+              postId: comment.postId,
+              userId: admin.id,
+              parentId: comment.id
+            }
+          })
         }
-      })
-
-      console.log(`✅ 已回复评论: ${comment.id}`)
+      }
     }
 
     console.log('✅ 评论检查完成')

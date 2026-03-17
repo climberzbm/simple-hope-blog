@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-import { Feed } from 'feed'
 import { prisma } from '../lib/prisma'
+import { generateTechArticle, generateLifeArticle } from '../lib/ai'
 
 // 技术文章模板主题
 const TECH_TOPICS = [
@@ -16,77 +15,18 @@ const TECH_TOPICS = [
   { title: 'AI 前端工具链集成', category: 'AI', tags: ['AI', '工程化'] },
   { title: 'ChatGPT API 调用实践', category: 'AI', tags: ['ChatGPT', 'API'] },
   { title: '大模型 Prompt 工程', category: 'AI', tags: ['AI', 'Prompt'] },
+  { title: 'Next.js 14 新特性详解', category: '前端开发', tags: ['Next.js', 'React'] },
+  { title: 'Tailwind CSS 实战技巧', category: '前端开发', tags: ['Tailwind', 'CSS'] },
+  { title: 'Zustand 状态管理指南', category: '前端开发', tags: ['Zustand', '状态管理'] },
 ]
 
 const LIFE_TOPICS = [
   { title: '程序员的一天', category: '生活随笔', tags: ['生活', '程序员'] },
   { title: '技术人的成长之路', category: '生活随笔', tags: ['成长', '随笔'] },
   { title: '学习方法的思考', category: '生活随笔', tags: ['学习', '思考'] },
+  { title: '远程工作的得与失', category: '生活随笔', tags: ['远程办公', '生活'] },
+  { title: '保持代码洁癖', category: '生活随笔', tags: ['编程习惯', '随笔'] },
 ]
-
-// 生成文章内容
-function generateContent(topic: typeof TECH_TOPICS[0]): string {
-  const intros = [
-    `今天我们来聊聊 ${topic.title}，这是前端开发中非常重要的话题。`,
-    `${topic.title} 是每个开发者都应该掌握的技能。`,
-    `在实践中，${topic.title} 能帮助我们写出更好的代码。`,
-  ]
-  
-  const content = `
-# ${topic.title}
-
-${intros[Math.floor(Math.random() * intros.length)]}
-
-## 背景
-
-在实际项目开发中，我们经常会遇到各种挑战。本文将分享一些实用的经验和技巧。
-
-## 核心要点
-
-### 1. 基础概念
-
-首先，我们需要理解核心概念。这是掌握任何技术的基础。
-
-### 2. 实践技巧
-
-以下是一些实践中的技巧：
-
-- 保持代码简洁
-- 注重可维护性
-- 编写测试用例
-
-### 3. 常见问题
-
-在实践中可能遇到的问题：
-
-\`\`\`typescript
-// 示例代码
-const example = () => {
-  console.log('Hello, World!')
-}
-\`\`\`
-
-## 总结
-
-${topic.title} 需要在实践中不断摸索。希望本文对你有所帮助。
-
----
-
-*本文由系统自动生成，如有问题请联系管理员。*
-`
-
-  return content.trim()
-}
-
-// 生成文章摘要
-function generateExcerpt(topic: typeof TECH_TOPICS[0]): string {
-  const excerpts = [
-    `分享关于 ${topic.title} 的实践经验。`,
-    `本文介绍 ${topic.title} 的核心概念和实践技巧。`,
-    `深入探讨 ${topic.title}，帮助你提升开发技能。`,
-  ]
-  return excerpts[Math.floor(Math.random() * excerpts.length)]
-}
 
 // 主函数：发布文章
 export async function publishArticle() {
@@ -97,6 +37,24 @@ export async function publishArticle() {
     const isLifeArticle = Math.random() < 0.2
     const topics = isLifeArticle ? LIFE_TOPICS : TECH_TOPICS
     const topic = topics[Math.floor(Math.random() * topics.length)]
+
+    console.log(`📝 生成文章主题: ${topic.title}`)
+
+    // 使用 AI 生成内容
+    let content: string
+    let excerpt: string
+
+    if (isLifeArticle) {
+      const result = await generateLifeArticle(topic.title)
+      content = result.content
+      excerpt = result.excerpt
+    } else {
+      const result = await generateTechArticle(topic.title, topic.category, topic.tags)
+      content = result.content
+      excerpt = result.excerpt
+    }
+
+    console.log(`✅ AI 生成完成，文章长度: ${content.length} 字`)
 
     // 检查分类是否存在
     let category = await prisma.category.findFirst({
@@ -121,10 +79,6 @@ export async function publishArticle() {
         return tag
       })
     )
-
-    // 生成文章内容
-    const content = generateContent(topic)
-    const excerpt = generateExcerpt(topic)
 
     // 生成 slug
     const slug = `${topic.title.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')}-${Date.now()}`
