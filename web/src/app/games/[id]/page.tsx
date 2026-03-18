@@ -55,7 +55,7 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props) {
   const game = games[params.id]
   if (!game) return { title: '游戏不存在' }
-  return { title: `${game.name} - Simple Hope Blog` }
+  return { title: `${game.name} - 简希博客` }
 }
 
 export default function GamePage({ params }: Props) {

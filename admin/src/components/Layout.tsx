@@ -7,6 +7,7 @@ import {
   TagsOutlined,
   MessageOutlined,
   PictureOutlined,
+  FolderOutlined,
   SettingOutlined,
   UserOutlined,
   LogoutOutlined,
@@ -25,6 +26,7 @@ const menuItems = [
   { key: '/tags', icon: <TagsOutlined />, label: '标签管理' },
   { key: '/comments', icon: <MessageOutlined />, label: '评论管理' },
   { key: '/media', icon: <PictureOutlined />, label: '媒体库' },
+  { key: '/resources', icon: <FolderOutlined />, label: '资源管理' },
   { key: '/settings', icon: <SettingOutlined />, label: '系统设置' },
 ]
 
@@ -59,7 +61,7 @@ export default function AdminLayout() {
     <Layout className="min-h-screen">
       <Sider trigger={null} collapsible collapsed={collapsed} width={220}>
         <div className="h-16 flex items-center justify-center text-white font-bold text-lg">
-          {collapsed ? 'Blog' : 'Simple Hope Blog'}
+          {collapsed ? '简希' : '简希博客'}
         </div>
         <Menu
           theme="dark"

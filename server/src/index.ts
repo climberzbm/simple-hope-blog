@@ -21,7 +21,7 @@ import likeRoutes from "./routes/likes"
 import mediaRoutes from "./routes/media"
 import statsRoutes from "./routes/stats"
 import settingsRoutes from "./routes/settings"
-import cronRoutes from "./routes/cron"
+import resourceRoutes from "./routes/resources"
 
 dotenv.config()
 
@@ -33,7 +33,7 @@ app.use(requestLogger)
 app.use(helmet())
 app.use(xssFilter)
 app.use(cors())
-app.use(koaBody({ multipart: true, formidable: { maxFileSize: 10 * 1024 * 1024 } }))
+app.use(koaBody({ multipart: true, formidable: { maxFileSize: 1024 * 1024 * 1024 } }))
 app.use(serve(path.join(__dirname, "../uploads")))
 app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }))
 app.use(loginRateLimit({ max: 5, lockTime: 15 * 60 * 1000 }))
@@ -51,7 +51,7 @@ router.use("/api/likes", likeRoutes.routes())
 router.use("/api/media", mediaRoutes.routes())
 router.use("/api/stats", statsRoutes.routes())
 router.use("/api/settings", settingsRoutes.routes())
-router.use("/api/cron", cronRoutes.routes())
+router.use("/api/resources", resourceRoutes.routes())
 
 app.use(router.routes()).use(router.allowedMethods())
 

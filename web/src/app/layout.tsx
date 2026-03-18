@@ -5,11 +5,16 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Simple Hope Blog',
-    template: '%s - Simple Hope Blog',
+    default: '简希博客',
+    template: '%s - 简希博客',
   },
   description: '个人技术博客，记录学习与成长',
   keywords: ['博客', '技术', '前端', '后端', 'AI'],
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 }
 
 export default function RootLayout({

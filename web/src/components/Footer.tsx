@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Simple Hope Blog. All rights reserved.
+            © {new Date().getFullYear()} 简希博客. All rights reserved.
           </div>
           <div className="flex gap-6 text-sm text-gray-500">
             <Link href="/rss" className="hover:text-blue-600">RSS</Link>

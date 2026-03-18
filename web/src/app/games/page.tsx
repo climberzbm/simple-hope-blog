@@ -46,7 +46,7 @@ const games = [
 ]
 
 export const metadata = {
-  title: '游戏 - Simple Hope Blog',
+  title: '游戏 - 简希博客',
 }
 
 export default function GamesPage() {

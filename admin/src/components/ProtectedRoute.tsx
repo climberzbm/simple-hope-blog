@@ -6,11 +6,16 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuth } = useAuthStore()
+  const { isAuth, user } = useAuthStore()
   const location = useLocation()
 
   if (!isAuth) {
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  // 非管理员无法访问
+  if (user?.role !== 'admin') {
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>

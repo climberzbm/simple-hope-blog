@@ -14,6 +14,14 @@ export default function Login() {
     setLoading(true)
     try {
       const res: any = await login(values)
+      
+      // 检查是否是管理员
+      if (res.data.user.role !== 'admin') {
+        message.error('无权限访问管理后台')
+        setLoading(false)
+        return
+      }
+      
       setAuth(res.data.user, res.data.token)
       message.success('登录成功')
       navigate('/')
@@ -43,7 +51,7 @@ export default function Login() {
           </Form.Item>
         </Form>
         <div className="text-center text-gray-400 text-sm">
-          默认账号: admin@climberzbm.cn / admin123
+          仅限管理员访问
         </div>
       </Card>
     </div>

@@ -28,9 +28,14 @@ export const useAuthStore = create<AuthState>()(
       isAuth: false,
       setUser: (user) => set({ user, isAuth: !!user }),
       setToken: (token) => set({ token }),
-      login: (user, token) => set({ user, token, isAuth: true }),
+      login: (user, token) => {
+        // 重要：同时存储到 localStorage，供 axios 拦截器使用
+        localStorage.setItem('token', token)
+        set({ user, token, isAuth: true })
+      },
       logout: () => {
         localStorage.removeItem('token')
+        localStorage.removeItem('auth-storage')
         set({ user: null, token: null, isAuth: false })
       },
     }),

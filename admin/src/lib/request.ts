@@ -87,3 +87,29 @@ export const getAbout = () => api.get('/settings/about')
 
 // 更新关于页
 export const updateAbout = (content: string) => api.put('/settings/about', { content })
+
+// 资源列表
+export const getResources = (params: any) => api.get('/resources', { params })
+
+// 上传资源
+export const uploadResource = (file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return api.post('/resources/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+// 创建文本资源
+export const createTextResource = (data: { name: string; content: string; category: string }) =>
+  api.post('/resources/text', data)
+
+// 更新资源
+export const updateResource = (id: string, data: { name?: string; content?: string }) =>
+  api.put(`/resources/${id}`, data)
+
+// 删除资源
+export const deleteResource = (id: string) => api.delete(`/resources/${id}`)
+
+// 资源统计
+export const getResourceStats = () => api.get('/resources/stats/overview')

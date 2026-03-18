@@ -18,14 +18,16 @@ export default function LoginPage() {
     setLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-
+    
     try {
       let res: any
       if (isLogin) {
-        res = await login({ email, password })
+        const account = formData.get('account') as string
+        const password = formData.get('password') as string
+        res = await login({ account, password })
       } else {
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
         const username = formData.get('username') as string
         res = await register({ email, password, username })
       }
@@ -46,27 +48,41 @@ export default function LoginPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {isLogin ? (
             <div>
-              <label className="block text-sm font-medium mb-1">用户名</label>
+              <label className="block text-sm font-medium mb-1">邮箱 / 用户名</label>
               <input
                 type="text"
-                name="username"
+                name="account"
                 required
+                placeholder="请输入邮箱或用户名"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent focus:outline-none focus:border-blue-500"
               />
             </div>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1">用户名</label>
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  minLength={3}
+                  maxLength={20}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">邮箱</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </>
           )}
-
-          <div>
-            <label className="block text-sm font-medium mb-1">邮箱</label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent focus:outline-none focus:border-blue-500"
-            />
-          </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">密码</label>

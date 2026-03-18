@@ -139,6 +139,31 @@ router.get('/admin/list', authMiddleware, adminMiddleware, validate(postQuerySch
 })
 
 /**
+ * 文章详情（后台管理）
+ */
+router.get('/admin/:id', authMiddleware, adminMiddleware, async (ctx) => {
+  const { id } = ctx.params
+
+  const post = await prisma.post.findUnique({
+    where: { id },
+    include: {
+      author: { select: { id: true, username: true, nickname: true } },
+      category: true,
+      tags: { include: { tag: true } },
+    },
+  })
+
+  if (!post) {
+    return Response.error(ctx, '文章不存在', 404)
+  }
+
+  Response.success(ctx, {
+    ...post,
+    tags: post.tags.map((t) => t.tag),
+  })
+})
+
+/**
  * 创建文章
  */
 router.post('/', authMiddleware, adminMiddleware, validate(createPostSchema), async (ctx) => {

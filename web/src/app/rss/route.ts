@@ -11,7 +11,7 @@ export async function GET() {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Simple Hope Blog</title>
+    <title>简希博客</title>
     <link>${baseUrl}</link>
     <description>个人技术博客，记录学习与成长</description>
     <language>zh-CN</language>

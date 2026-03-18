@@ -57,14 +57,19 @@ router.post('/register', validate(registerSchema), async (ctx) => {
 })
 
 /**
- * 用户登录
+ * 用户登录 - 支持邮箱或用户名
  */
 router.post('/login', validate(loginSchema), async (ctx) => {
-  const { email, password } = ctx.state.validatedData
+  const { account, password } = ctx.state.validatedData
 
+  // 判断是邮箱还是用户名
+  const isEmail = account.includes('@')
+  
   // 查找用户
-  const user = await prisma.user.findUnique({
-    where: { email },
+  const user = await prisma.user.findFirst({
+    where: isEmail 
+      ? { email: account }
+      : { username: account },
   })
 
   if (!user) {

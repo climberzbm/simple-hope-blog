@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useMemo } from 'react'
 import { useAuthStore } from '@/stores/auth'
 import { createComment, deleteComment } from '@/lib/request'
 import { formatDistanceToNow } from 'date-fns'
@@ -18,6 +18,35 @@ interface Props {
   postId: string
   comments: Comment[]
   onRefresh: () => void
+}
+
+// 随机头像背景色
+const AVATAR_COLORS = [
+  'bg-red-400',
+  'bg-orange-400',
+  'bg-amber-400',
+  'bg-yellow-400',
+  'bg-lime-400',
+  'bg-green-400',
+  'bg-emerald-400',
+  'bg-teal-400',
+  'bg-cyan-400',
+  'bg-sky-400',
+  'bg-blue-400',
+  'bg-indigo-400',
+  'bg-violet-400',
+  'bg-purple-400',
+  'bg-fuchsia-400',
+  'bg-pink-400',
+  'bg-rose-400',
+]
+
+function getAvatarColor(username: string): string {
+  let hash = 0
+  for (let i = 0; i < username.length; i++) {
+    hash = username.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
 }
 
 export default function CommentSection({ postId, comments, onRefresh }: Props) {
@@ -116,11 +145,13 @@ function CommentItem({
   onReply: (comment: Comment) => void
   level?: number
 }) {
+  const avatarColor = useMemo(() => getAvatarColor(comment.user.username), [comment.user.username])
+
   return (
     <div className={`${level > 0 ? 'ml-8 border-l-2 border-gray-100 dark:border-gray-800 pl-4' : ''}`}>
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm">
-          {comment.user.nickname?.[0] || comment.user.username[0]}
+        <div className={`w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center text-sm text-white font-medium`}>
+          {comment.user.nickname?.[0] || comment.user.username[0]?.toUpperCase()}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">

@@ -1,7 +1,7 @@
 import api from './api'
 
 // 认证
-export const login = (data: { email: string; password: string }) => api.post('/auth/login', data)
+export const login = (data: { account: string; password: string }) => api.post('/auth/login', data)
 export const register = (data: { username: string; email: string; password: string }) =>
   api.post('/auth/register', data)
 export const getMe = () => api.get('/auth/me')
