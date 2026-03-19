@@ -7,11 +7,17 @@ export const registerSchema = z.object({
   password: z.string().min(6, '密码至少6个字符').max(50, '密码最多50个字符'),
 })
 
-// 登录参数 - 支持邮箱或用户名
+// 登录参数 - 支持两种方式
+// 1. account + password（前台，支持邮箱或用户名）
+// 2. email + password（后台，兼容旧逻辑）
 export const loginSchema = z.object({
-  account: z.string().min(1, '请输入邮箱或用户名'),
+  account: z.string().optional(),
+  email: z.string().optional(),
   password: z.string().min(1, '请输入密码'),
-})
+}).refine(
+  (data) => data.account || data.email,
+  { message: '请输入邮箱或用户名', path: ['account'] }
+)
 
 // 修改密码参数
 export const changePasswordSchema = z.object({
