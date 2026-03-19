@@ -61,10 +61,10 @@ export default async function Home() {
                   📍 杭州
                 </span>
                 <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white/60 dark:bg-gray-800/60 rounded-full backdrop-blur-sm">
-                  💻 前端开发
+                  💻 全栈开发
                 </span>
                 <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white/60 dark:bg-gray-800/60 rounded-full backdrop-blur-sm">
-                  🚀 3年经验
+                  🚀 6年经验
                 </span>
               </div>
             </div>
