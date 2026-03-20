@@ -24,9 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased">
+      <body className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased overflow-x-hidden">
         <Header />
-        <main className="pt-16 min-h-screen">{children}</main>
+        <main className="pt-16 min-h-screen overflow-x-hidden">{children}</main>
         <Footer />
       </body>
     </html>

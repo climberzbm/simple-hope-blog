@@ -40,9 +40,9 @@ export default async function PostPage({ params }: Props) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 overflow-x-hidden">
       <article className="grid lg:grid-cols-[1fr_250px] gap-8">
-        <div>
+        <div className="min-w-0 overflow-hidden">
           {/* Header */}
           <header className="mb-8">
             <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">

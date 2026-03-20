@@ -27,7 +27,7 @@ export default async function Home() {
   })
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-gray-950">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-gray-950 overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/80 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-16 md:py-24">
         {/* 装饰背景 */}

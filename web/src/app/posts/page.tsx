@@ -254,7 +254,7 @@ function PostsContent() {
 export default function PostsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 overflow-x-hidden">
         <div className="bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950 border-b border-gray-100 dark:border-gray-800">
           <div className="max-w-5xl mx-auto px-4 py-12">
             <h1 className="text-3xl font-bold mb-2">文章</h1>

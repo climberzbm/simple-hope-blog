@@ -2,6 +2,21 @@
 .markdown-body {
   line-height: 1.7;
   color: inherit;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 防止所有元素溢出 */
+.markdown-body > * {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* 长链接自动换行 */
+.markdown-body a,
+.markdown-body code {
+  word-break: break-all;
 }
 
 /* Highlight.js 主题 - 简化版 */
