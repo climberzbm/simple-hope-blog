@@ -44,7 +44,7 @@ export default function MarkdownRenderer({ content }: Props) {
   }, [processedContent])
 
   return (
-    <div ref={containerRef} className="markdown-body">
+    <div ref={containerRef} className="markdown-body max-w-full overflow-x-hidden">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight, rehypeRaw]}

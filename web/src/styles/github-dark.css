@@ -5,6 +5,8 @@
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* 防止所有元素溢出 */
@@ -14,9 +16,14 @@
 }
 
 /* 长链接自动换行 */
-.markdown-body a,
-.markdown-body code {
+.markdown-body a {
   word-break: break-all;
+}
+
+/* 行内代码也换行 */
+.markdown-body code:not(.hljs) {
+  word-break: break-all;
+  white-space: normal;
 }
 
 /* Highlight.js 主题 - 简化版 */
@@ -107,7 +114,7 @@
   color: #60a5fa;
 }
 
-/* 代码块 */
+/* 代码块 - 允许横向滚动但不溢出容器 */
 .markdown-body pre {
   position: relative;
   padding: 1rem;
@@ -115,6 +122,8 @@
   border-radius: 0.5rem;
   overflow-x: auto;
   background: #1f2937;
+  max-width: calc(100vw - 2rem);
+  -webkit-overflow-scrolling: touch;
 }
 
 .dark .markdown-body pre {
@@ -210,11 +219,15 @@
   margin: 1rem 0;
 }
 
-/* 表格 */
+/* 表格 - 响应式滚动 */
 .markdown-body table {
+  display: block;
   width: 100%;
+  max-width: calc(100vw - 2rem);
   border-collapse: collapse;
   margin: 1rem 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .markdown-body th,
@@ -222,6 +235,7 @@
   border: 1px solid #e5e7eb;
   padding: 0.5rem;
   text-align: left;
+  white-space: nowrap;
 }
 
 .dark .markdown-body th,

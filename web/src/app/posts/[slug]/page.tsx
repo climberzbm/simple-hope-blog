@@ -45,7 +45,7 @@ export default async function PostPage({ params }: Props) {
         <div className="min-w-0 overflow-hidden">
           {/* Header */}
           <header className="mb-8">
-            <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-gray-500">
               {post.category && (
                 <Link href={`/posts?category=${post.category.slug}`} className="hover:text-blue-600">
                   {post.category.name}
@@ -56,7 +56,7 @@ export default async function PostPage({ params }: Props) {
               <span>·</span>
               <span>{post.viewCount} 阅读</span>
             </div>
-            <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-4 break-words">{post.title}</h1>
             {post.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag: any) => (
