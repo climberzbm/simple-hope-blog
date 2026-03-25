@@ -20,7 +20,7 @@ module.exports = {
     },
     {
       name: 'blog-web',
-      cwd: '/var/www/simple-hope-blog/web',
+      cwd: '/var/www/simple-hope-blog/web/web',
       script: 'server.js',
       interpreter: 'node',
       env: {

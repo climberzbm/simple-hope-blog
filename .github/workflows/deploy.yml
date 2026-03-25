@@ -56,17 +56,21 @@ jobs:
         run: |
           mkdir -p package/server package/web package/admin
           
-          # Server: dist + node_modules + prisma
+          # Server: dist + node_modules (解析符号链接) + prisma
           cp -r server/dist package/server/
-          cp -r server/node_modules package/server/
+          mkdir -p package/server/node_modules
+          # 使用 -L 解析符号链接，复制实际文件
+          cp -rL server/node_modules/* package/server/node_modules/ 2>/dev/null || true
           cp -r server/prisma package/server/
           
-          # Web: standalone 内容直接放 web 目录（不需要嵌套）
-          cp -r web/.next/standalone/* package/web/
-          # static 和 public 放到正确位置
-          mkdir -p package/web/.next/static
-          cp -r web/.next/static/* package/web/.next/static/
-          cp -r web/public package/web/
+          # Web: standalone
+          mkdir -p package/web
+          if [ -d "web/.next/standalone" ]; then
+            cp -r web/.next/standalone/* package/web/
+            mkdir -p package/web/.next/static
+            cp -r web/.next/static/* package/web/.next/static/
+            cp -r web/public package/web/
+          fi
           
           # Admin: 静态文件
           cp -r admin/dist package/admin/
