@@ -26,6 +26,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
+        NEXT_PUBLIC_API_URL: 'https://climberzbm.cn/api',
+        API_URL: 'http://127.0.0.1:3001/api',
       },
       instances: 'max',
       exec_mode: 'cluster',

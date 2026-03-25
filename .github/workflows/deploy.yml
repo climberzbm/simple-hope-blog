@@ -63,10 +63,11 @@ jobs:
           cp -rL server/node_modules/* package/server/node_modules/ 2>/dev/null || true
           cp -r server/prisma package/server/
           
-          # Web: standalone
+          # Web: 复制 standalone 内容和 static 文件
           mkdir -p package/web
           if [ -d "web/.next/standalone" ]; then
             cp -r web/.next/standalone/* package/web/
+            # static 文件放到正确位置
             mkdir -p package/web/.next/static
             cp -r web/.next/static/* package/web/.next/static/
             cp -r web/public package/web/
