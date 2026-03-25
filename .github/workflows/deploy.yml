@@ -61,8 +61,12 @@ jobs:
           cp -r server/node_modules package/server/
           cp -r server/prisma package/server/
           
-          # Web: standalone
+          # Web: standalone 内容直接放 web 目录（不需要嵌套）
           cp -r web/.next/standalone/* package/web/
+          # static 和 public 放到正确位置
+          mkdir -p package/web/.next/static
+          cp -r web/.next/static/* package/web/.next/static/
+          cp -r web/public package/web/
           
           # Admin: 静态文件
           cp -r admin/dist package/admin/

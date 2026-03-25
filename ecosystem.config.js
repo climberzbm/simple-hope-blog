@@ -21,7 +21,7 @@ module.exports = {
     {
       name: 'blog-web',
       cwd: '/var/www/simple-hope-blog/web',
-      script: '.next/standalone/server.js',
+      script: 'server.js',
       interpreter: 'node',
       env: {
         NODE_ENV: 'production',
