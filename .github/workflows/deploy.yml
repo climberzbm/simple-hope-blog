@@ -1,45 +1,62 @@
-name: Deploy to Production
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate Prisma Client
+        run: cd server && npx prisma generate
+
+      - name: Build all projects
+        run: pnpm -r build
+
       - name: Deploy to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: |
+            server/dist,
+            server/node_modules,
+            web/.next,
+            admin/dist,
+            shared/dist,
+            server/prisma
+          target: /var/www/simple-hope-blog
+          strip_components: 0
+
+      - name: Run migrations and restart
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          port: 22
-          command_timeout: 30m
           script: |
-            cd /var/www/simple-hope-blog
-            
-            echo ">>> Pulling latest code..."
-            git stash
-            git pull origin main
-            
-            echo ">>> Installing dependencies..."
-            pnpm install
-            
-            echo ">>> Running database migrations..."
-            cd server
+            cd /var/www/simple-hope-blog/server
             npx prisma migrate deploy
-            npx prisma generate
-            
-            echo ">>> Building projects..."
-            cd ..
-            pnpm -r build
-            
-            echo ">>> Restarting services..."
             pm2 restart all
-            
-            echo ">>> Deployment completed!"
             pm2 list
