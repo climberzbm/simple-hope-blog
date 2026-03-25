@@ -6,8 +6,12 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -17,15 +21,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        id: pnpm-cache
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         run: cd server && npx prisma generate
@@ -33,30 +51,95 @@ jobs:
       - name: Build all projects
         run: pnpm -r build
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            server/dist
+            server/node_modules
+            server/prisma
+            web/.next
+            web/public
+            admin/dist
+            shared/dist
+            web/package.json
+            admin/package.json
+            server/package.json
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./build
+
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deploy/server deploy/web deploy/admin deploy/shared
+          mv build/server/dist deploy/server/
+          mv build/server/node_modules deploy/server/
+          mv build/server/prisma deploy/server/
+          mv build/server/package.json deploy/server/
+          mv build/web/.next deploy/web/
+          mv build/web/public deploy/web/
+          mv build/web/package.json deploy/web/
+          mv build/admin/dist deploy/admin/
+          mv build/admin/package.json deploy/admin/
+          mv build/shared/dist deploy/shared/
+
       - name: Deploy to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          source: |
-            server/dist,
-            server/node_modules,
-            web/.next,
-            admin/dist,
-            shared/dist,
-            server/prisma
-          target: /var/www/simple-hope-blog
-          strip_components: 0
+          source: "deploy"
+          target: "/tmp"
+          strip_components: 1
 
-      - name: Run migrations and restart
+      - name: Run migrations and restart services
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
+          command_timeout: 10m
           script: |
-            cd /var/www/simple-hope-blog/server
+            # 设置目标目录
+            TARGET_DIR="/var/www/simple-hope-blog"
+            
+            # 备份旧版本
+            if [ -d "$TARGET_DIR/server/dist" ]; then
+              echo "Backing up old version..."
+              mv $TARGET_DIR/server/dist $TARGET_DIR/server/dist.bak
+            fi
+            
+            # 部署新版本
+            echo "Deploying new version..."
+            cp -r /tmp/deploy/server/* $TARGET_DIR/server/
+            cp -r /tmp/deploy/web/* $TARGET_DIR/web/
+            cp -r /tmp/deploy/admin/* $TARGET_DIR/admin/
+            cp -r /tmp/deploy/shared/* $TARGET_DIR/shared/
+            
+            # 运行数据库迁移
+            echo "Running database migrations..."
+            cd $TARGET_DIR/server
             npx prisma migrate deploy
-            pm2 restart all
+            
+            # 重启服务
+            echo "Restarting services..."
+            pm2 restart blog-server blog-web blog-admin
+            
+            # 检查服务状态
             pm2 list
+            
+            # 清理临时文件
+            rm -rf /tmp/deploy
+            
+            echo "Deployment completed!"
