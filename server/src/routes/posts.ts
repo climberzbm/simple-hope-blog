@@ -81,15 +81,54 @@ router.get('/:slug', async (ctx) => {
     return Response.error(ctx, '文章不存在', 404)
   }
 
-  // 增加阅读量
-  await prisma.post.update({
-    where: { id: post.id },
-    data: { viewCount: { increment: 1 } },
-  })
+  // 获取访问者标识
+  const userId = ctx.state.user?.id || null
+  const ip = ctx.ip || ctx.headers['x-forwarded-for'] || null
+  const userAgent = ctx.headers['user-agent'] || null
+
+  // 检查是否已记录浏览
+  let shouldCountView = false
+  if (userId) {
+    // 已登录用户：检查是否已浏览
+    const existingView = await prisma.postView.findUnique({
+      where: { postId_userId: { postId: post.id, userId } }
+    })
+    if (!existingView) {
+      shouldCountView = true
+    }
+  } else {
+    // 未登录用户：检查 IP 是否已浏览
+    const existingView = await prisma.postView.findFirst({
+      where: { postId: post.id, ip: String(ip) }
+    })
+    if (!existingView) {
+      shouldCountView = true
+    }
+  }
+
+  // 记录浏览并增加阅读量
+  let viewCount = post.viewCount
+  if (shouldCountView) {
+    await Promise.all([
+      prisma.postView.create({
+        data: {
+          postId: post.id,
+          userId,
+          ip: String(ip),
+          userAgent,
+        }
+      }),
+      prisma.post.update({
+        where: { id: post.id },
+        data: { viewCount: { increment: 1 } },
+      })
+    ])
+    viewCount += 1
+  }
 
   Response.success(ctx, {
     ...post,
-    viewCount: post.viewCount + 1,
+    viewCount,
     tags: post.tags.map((t) => t.tag),
   })
 })

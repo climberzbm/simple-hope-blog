@@ -54,6 +54,7 @@ model Post {
   tags         PostTag[]
   comments     Comment[]
   likes        Like[]
+  views        PostView[]
 
   @@index([status, publishedAt])
   @@index([authorId])
@@ -163,5 +164,21 @@ model Resource {
 
   @@index([type])
   @@index([category])
+  @@index([createdAt])
+}
+
+// 文章浏览记录
+model PostView {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String?  // 已登录用户ID
+  ip        String?  // 未登录用户IP
+  userAgent String?  // 浏览器UA
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId]) // 同一用户对同一文章只记录一次
+  @@index([postId])
   @@index([createdAt])
 }
