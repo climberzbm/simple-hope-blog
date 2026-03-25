@@ -31,7 +31,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: cd server && ../node_modules/.bin/prisma generate
+        run: cd server && npx prisma@5.22.0 generate
 
       - name: Build all projects
         run: pnpm -r build
@@ -116,12 +116,7 @@ jobs:
             
             echo ">>> Running migrations..."
             cd $BASE/server
-            # prisma 可能在 workspace root 或 server/node_modules
-            if [ -f node_modules/.bin/prisma ]; then
-              ./node_modules/.bin/prisma migrate deploy
-            else
-              npx prisma@5 migrate deploy
-            fi
+            npx prisma@5.22.0 migrate deploy
             
             echo ">>> Restarting services..."
             pm2 restart all || pm2 start $BASE/ecosystem.config.js
