@@ -31,16 +31,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: cd server && npx prisma generate
+        run: cd server && ../node_modules/.bin/prisma generate
 
       - name: Build all projects
         run: pnpm -r build
 
-      # Server: 只保留生产依赖
+      # Server: 准备部署
       - name: Prepare server
         run: |
           cd server
-          pnpm prune --prod
+          # 不 prune，保留完整 node_modules（包含 prisma CLI）
+          echo "Server ready for deployment"
 
       # Web: 复制 static 文件到 standalone
       - name: Prepare web
@@ -115,7 +116,12 @@ jobs:
             
             echo ">>> Running migrations..."
             cd $BASE/server
-            npx prisma migrate deploy
+            # prisma 可能在 workspace root 或 server/node_modules
+            if [ -f node_modules/.bin/prisma ]; then
+              ./node_modules/.bin/prisma migrate deploy
+            else
+              npx prisma@5 migrate deploy
+            fi
             
             echo ">>> Restarting services..."
             pm2 restart all || pm2 start $BASE/ecosystem.config.js
