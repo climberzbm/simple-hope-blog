@@ -8,7 +8,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
 
 jobs:
   build:
@@ -26,21 +25,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-        id: pnpm-cache
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          version: 9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -51,21 +36,47 @@ jobs:
       - name: Build all projects
         run: pnpm -r build
 
-      - name: Upload build artifacts
+      # Server: 只保留生产依赖
+      - name: Prepare server
+        run: |
+          cd server
+          pnpm prune --prod
+
+      # Web: 复制 static 文件到 standalone
+      - name: Prepare web
+        run: |
+          cd web
+          mkdir -p .next/standalone/.next/static
+          cp -r .next/static .next/standalone/.next/
+          cp -r public .next/standalone/
+
+      # 打包部署文件
+      - name: Create deployment package
+        run: |
+          mkdir -p package/server package/web package/admin
+          
+          # Server: dist + node_modules + prisma
+          cp -r server/dist package/server/
+          cp -r server/node_modules package/server/
+          cp -r server/prisma package/server/
+          
+          # Web: standalone
+          cp -r web/.next/standalone/* package/web/
+          
+          # Admin: 静态文件
+          cp -r admin/dist package/admin/
+          
+          # PM2 配置
+          cp ecosystem.config.js package/
+          
+          # 打包
+          tar -czvf deploy.tar.gz -C package .
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: |
-            server/dist
-            server/node_modules
-            server/prisma
-            web/.next
-            web/public
-            admin/dist
-            shared/dist
-            web/package.json
-            admin/package.json
-            server/package.json
+          name: deploy
+          path: deploy.tar.gz
           retention-days: 1
 
   deploy:
@@ -73,37 +84,21 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Download build artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
-          path: ./build
+          name: deploy
 
-      - name: Prepare deployment package
-        run: |
-          mkdir -p deploy/server deploy/web deploy/admin deploy/shared
-          mv build/server/dist deploy/server/
-          mv build/server/node_modules deploy/server/
-          mv build/server/prisma deploy/server/
-          mv build/server/package.json deploy/server/
-          mv build/web/.next deploy/web/
-          mv build/web/public deploy/web/
-          mv build/web/package.json deploy/web/
-          mv build/admin/dist deploy/admin/
-          mv build/admin/package.json deploy/admin/
-          mv build/shared/dist deploy/shared/
-
-      - name: Deploy to server
+      - name: Copy to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          source: "deploy"
+          source: "deploy.tar.gz"
           target: "/tmp"
-          strip_components: 1
 
-      - name: Run migrations and restart services
+      - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -111,35 +106,22 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           command_timeout: 10m
           script: |
-            # 设置目标目录
-            TARGET_DIR="/var/www/simple-hope-blog"
+            set -e
             
-            # 备份旧版本
-            if [ -d "$TARGET_DIR/server/dist" ]; then
-              echo "Backing up old version..."
-              mv $TARGET_DIR/server/dist $TARGET_DIR/server/dist.bak
-            fi
+            BASE="/var/www/simple-hope-blog"
             
-            # 部署新版本
-            echo "Deploying new version..."
-            cp -r /tmp/deploy/server/* $TARGET_DIR/server/
-            cp -r /tmp/deploy/web/* $TARGET_DIR/web/
-            cp -r /tmp/deploy/admin/* $TARGET_DIR/admin/
-            cp -r /tmp/deploy/shared/* $TARGET_DIR/shared/
+            echo ">>> Extracting..."
+            cd /tmp && tar -xzvf deploy.tar.gz -C $BASE
             
-            # 运行数据库迁移
-            echo "Running database migrations..."
-            cd $TARGET_DIR/server
+            echo ">>> Running migrations..."
+            cd $BASE/server
             npx prisma migrate deploy
             
-            # 重启服务
-            echo "Restarting services..."
-            pm2 restart blog-server blog-web blog-admin
+            echo ">>> Restarting services..."
+            pm2 restart all || pm2 start $BASE/ecosystem.config.js
             
-            # 检查服务状态
+            echo ">>> Cleanup..."
+            rm -f /tmp/deploy.tar.gz
+            
             pm2 list
-            
-            # 清理临时文件
-            rm -rf /tmp/deploy
-            
-            echo "Deployment completed!"
+            echo ">>> Done!"
