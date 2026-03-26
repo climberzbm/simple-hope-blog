@@ -183,7 +183,7 @@ router.post('/admin/:id/posts', authMiddleware, adminMiddleware, validate(setPos
   // 创建新的关联
   if (postIds.length > 0) {
     await prisma.postSeries.createMany({
-      data: postIds.map((postId, index) => ({
+      data: postIds.map((postId: string, index: number) => ({
         postId,
         seriesId: id,
         order: index,
