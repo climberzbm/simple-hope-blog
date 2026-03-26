@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Typography, Space, Transfer } from 'antd'
+import type { TransferProps } from 'antd'
 import { PlusOutlined, OrderedListOutlined } from '@ant-design/icons'
 import api from '@/lib/api'
 
@@ -29,7 +30,6 @@ export default function SeriesPage() {
   const [form] = Form.useForm()
   const [availablePosts, setAvailablePosts] = useState<Post[]>([])
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([])
-  const [currentPostIds, setCurrentPostIds] = useState<string[]>([])
 
   useEffect(() => {
     fetchSeries()
@@ -82,11 +82,9 @@ export default function SeriesPage() {
 
   const handleManagePosts = async (record: Series) => {
     setCurrentSeriesId(record.id)
-    setCurrentPostIds([]) // 已选中的文章ID
     setSelectedPostIds([])
 
     try {
-      // 获取可选文章
       const res: any = await api.get(`/series/admin/${record.id}/available-posts`)
       const posts = (res.data || []).map((p: any) => ({
         ...p,
@@ -110,6 +108,10 @@ export default function SeriesPage() {
     } catch (error: any) {
       message.error(error.response?.data?.message || '设置失败')
     }
+  }
+
+  const handleTransferChange: TransferProps['onChange'] = (targetKeys) => {
+    setSelectedPostIds(targetKeys as string[])
   }
 
   const columns = [
@@ -196,7 +198,7 @@ export default function SeriesPage() {
           dataSource={availablePosts}
           titles={['可选文章', '已选文章']}
           targetKeys={selectedPostIds}
-          onChange={setSelectedPostIds}
+          onChange={handleTransferChange}
           render={(item) => item.title}
           listStyle={{ width: 280, height: 400 }}
           showSearch
