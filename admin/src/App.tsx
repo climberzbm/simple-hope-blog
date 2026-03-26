@@ -11,6 +11,8 @@ import Comments from './pages/Comments'
 import Media from './pages/Media'
 import Resources from './pages/Resources'
 import Settings from './pages/Settings'
+import FriendLinks from './pages/FriendLinks'
+import Series from './pages/Series'
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
         <Route path="comments" element={<Comments />} />
         <Route path="media" element={<Media />} />
         <Route path="resources" element={<Resources />} />
+        <Route path="friend-links" element={<FriendLinks />} />
+        <Route path="series" element={<Series />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

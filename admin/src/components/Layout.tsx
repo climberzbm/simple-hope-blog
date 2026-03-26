@@ -13,6 +13,8 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  LinkOutlined,
+  BookOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/stores/auth'
@@ -22,11 +24,13 @@ const { Header, Sider, Content } = Layout
 const menuItems = [
   { key: '/', icon: <DashboardOutlined />, label: '仪表盘' },
   { key: '/posts', icon: <FileTextOutlined />, label: '文章管理' },
+  { key: '/series', icon: <BookOutlined />, label: '系列管理' },
   { key: '/categories', icon: <AppstoreOutlined />, label: '分类管理' },
   { key: '/tags', icon: <TagsOutlined />, label: '标签管理' },
   { key: '/comments', icon: <MessageOutlined />, label: '评论管理' },
   { key: '/media', icon: <PictureOutlined />, label: '媒体库' },
   { key: '/resources', icon: <FolderOutlined />, label: '资源管理' },
+  { key: '/friend-links', icon: <LinkOutlined />, label: '友链管理' },
   { key: '/settings', icon: <SettingOutlined />, label: '系统设置' },
 ]
 

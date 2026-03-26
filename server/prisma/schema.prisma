@@ -55,6 +55,7 @@ model Post {
   comments     Comment[]
   likes        Like[]
   views        PostView[]
+  series       PostSeries[]
 
   @@index([status, publishedAt])
   @@index([authorId])
@@ -181,4 +182,49 @@ model PostView {
   @@unique([postId, userId]) // 同一用户对同一文章只记录一次
   @@index([postId])
   @@index([createdAt])
+}
+
+// 友链
+model FriendLink {
+  id          String   @id @default(cuid())
+  name        String                  // 网站名称
+  url         String                  // 网站地址
+  avatar      String?                 // 头像/Logo
+  description String?   @db.Text     // 网站描述
+  status      String   @default("pending") // pending: 待审核, approved: 已通过, rejected: 已拒绝
+  order       Int      @default(0)   // 排序权重
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([order])
+}
+
+// 文章系列
+model Series {
+  id          String   @id @default(cuid())
+  name        String                  // 系列名称
+  slug        String    @unique       // URL 友好标识
+  description String?   @db.Text     // 系列简介
+  cover       String?                 // 封面图
+  order       Int      @default(0)   // 排序权重
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts       PostSeries[]
+
+  @@index([order])
+}
+
+// 文章-系列关联
+model PostSeries {
+  postId  String
+  seriesId String
+  order   Int      @default(0)   // 系列内文章排序
+
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  series  Series  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@id([postId, seriesId])
+  @@index([seriesId])
 }

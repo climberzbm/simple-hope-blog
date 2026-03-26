@@ -22,6 +22,8 @@ import mediaRoutes from "./routes/media"
 import statsRoutes from "./routes/stats"
 import settingsRoutes from "./routes/settings"
 import resourceRoutes from "./routes/resources"
+import friendLinkRoutes from "./routes/friend-links"
+import seriesRoutes from "./routes/series"
 
 dotenv.config()
 
@@ -52,6 +54,8 @@ router.use("/api/media", mediaRoutes.routes())
 router.use("/api/stats", statsRoutes.routes())
 router.use("/api/settings", settingsRoutes.routes())
 router.use("/api/resources", resourceRoutes.routes())
+router.use("/api/friend-links", friendLinkRoutes.routes())
+router.use("/api/series", seriesRoutes.routes())
 
 app.use(router.routes()).use(router.allowedMethods())
 
