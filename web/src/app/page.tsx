@@ -192,6 +192,9 @@ export default async function Home() {
                   <Link href="/archive" className="flex items-center gap-2 p-3 rounded-xl bg-white/60 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-all text-sm shadow-sm hover:shadow">
                     <span>📅</span> 归档
                   </Link>
+                  <Link href="/links" className="flex items-center gap-2 p-3 rounded-xl bg-white/60 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-all text-sm shadow-sm hover:shadow">
+                    <span>🔗</span> 友链
+                  </Link>
                   <Link href="/games" className="flex items-center gap-2 p-3 rounded-xl bg-white/60 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-all text-sm shadow-sm hover:shadow">
                     <span>🎮</span> 游戏
                   </Link>
