@@ -63,6 +63,66 @@ router.get('/', validate(postQuerySchema, 'query'), async (ctx) => {
 })
 
 /**
+ * 相关文章推荐（根据标签匹配）
+ */
+router.get('/:slug/related', async (ctx) => {
+  const { slug } = ctx.params
+  const limit = parseInt(ctx.query.limit as string) || 5
+
+  // 获取当前文章及其标签
+  const post = await prisma.post.findUnique({
+    where: { slug },
+    include: { tags: { include: { tag: true } } },
+  })
+
+  if (!post || post.status !== 'published') {
+    return Response.success(ctx, [], '文章不存在')
+  }
+
+  const tagIds = post.tags.map((t) => t.tagId)
+  if (tagIds.length === 0) {
+    return Response.success(ctx, [])
+  }
+
+  // 查找有相同标签的文章
+  const relatedPosts = await prisma.post.findMany({
+    where: {
+      status: 'published',
+      id: { not: post.id },
+      tags: { some: { tagId: { in: tagIds } } },
+    },
+    include: {
+      category: true,
+      tags: { include: { tag: true } },
+      _count: { select: { tags: true } },
+    },
+    take: limit * 2, // 多取一些，后面排序
+  })
+
+  // 按共同标签数量排序
+  const sorted = relatedPosts
+    .map((p) => {
+      const commonTags = p.tags.filter((t) => tagIds.includes(t.tagId)).length
+      return { ...p, commonTags }
+    })
+    .sort((a, b) => b.commonTags - a.commonTags)
+    .slice(0, limit)
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt,
+      cover: p.cover,
+      publishedAt: p.publishedAt,
+      viewCount: p.viewCount,
+      category: p.category,
+      tags: p.tags.map((t) => t.tag),
+    }))
+
+  Response.success(ctx, sorted)
+})
+
+/**
  * 文章详情（公开）
  */
 router.get('/:slug', async (ctx) => {

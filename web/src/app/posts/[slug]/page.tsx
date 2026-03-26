@@ -8,6 +8,7 @@ import MarkdownRenderer from '@/components/MarkdownRenderer'
 import CommentSectionClient from './CommentSectionClient'
 import LikeButton from './LikeButton'
 import BackToTop from '@/components/BackToTop'
+import RelatedPosts from '@/components/RelatedPosts'
 
 interface Props {
   params: { slug: string }
@@ -55,6 +56,8 @@ export default async function PostPage({ params }: Props) {
               <time>{format(new Date(post.publishedAt), 'PPP', { locale: zhCN })}</time>
               <span>·</span>
               <span>{post.viewCount} 阅读</span>
+              <span>·</span>
+              <span>预计 {Math.max(1, Math.ceil(post.content.replace(/<[^>]*>/g, '').length / 400))} 分钟</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-4 break-words">{post.title}</h1>
             {post.tags?.length > 0 && (
@@ -82,6 +85,9 @@ export default async function PostPage({ params }: Props) {
             <LikeButton postId={post.id} initialCount={post.likeCount} />
             <span className="text-gray-500">{post.commentCount} 评论</span>
           </div>
+
+          {/* Related Posts */}
+          <RelatedPosts slug={params.slug} />
 
           {/* Comments */}
           <section className="mt-8">

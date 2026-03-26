@@ -11,6 +11,8 @@ export const changePassword = (data: any) => api.put('/auth/password', data)
 // 文章
 export const getPosts = (params?: any) => api.get('/posts', { params })
 export const getPost = (slug: string) => api.get(`/posts/${slug}`)
+export const getRelatedPosts = (slug: string, limit?: number) =>
+  api.get(`/posts/${slug}/related`, { params: { limit } })
 
 // 分类
 export const getCategories = () => api.get('/categories')
