@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+# 防止并发部署导致竞态条件
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: '24'
 
@@ -119,6 +124,11 @@ jobs:
             set -e
             
             BASE="/var/www/simple-hope-blog"
+            
+            echo ">>> Cleaning old static files..."
+            rm -rf $BASE/web/web/.next/static
+            rm -rf $BASE/web/public
+            rm -rf $BASE/admin/dist
             
             echo ">>> Extracting..."
             cd /tmp && tar -xzvf deploy.tar.gz -C $BASE
