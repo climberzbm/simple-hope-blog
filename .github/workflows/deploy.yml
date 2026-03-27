@@ -69,13 +69,11 @@ jobs:
           cp -r server/prisma package/server/
           
           # Web: 复制 standalone 内容和 static 文件
-          # standalone 结构: .next/standalone/web/(server.js,node_modules) 和 .next/standalone/.next/(static,server,...)
-          # PM2 cwd 是 /var/www/simple-hope-blog/web/web，所以 .next/ 必须在 web/web/.next/
+          # standalone 结构: .next/standalone/web/(server.js, .next/, node_modules/)
+          # PM2 cwd 是 /var/www/simple-hope-blog/web/web，直接复制整个 web/ 目录（注意不要用 * 通配符，会丢失 .next/）
           if [ -d "web/.next/standalone" ]; then
-            mkdir -p package/web/web/.next
-            cp -r web/.next/standalone/web/* package/web/web/
-            cp -r web/.next/standalone/.next/* package/web/web/.next/
-            cp -r web/public package/web/web/
+            cp -r web/.next/standalone/web/ package/web/web
+            cp -r web/public/ package/web/web/public
           fi
           
           # Admin: 静态文件
@@ -126,10 +124,7 @@ jobs:
             BASE="/var/www/simple-hope-blog"
             
             echo ">>> Cleaning old files..."
-            rm -rf $BASE/web/web/.next
-            rm -rf $BASE/web/public
-            rm -rf $BASE/web/node_modules
-            rm -rf $BASE/admin/dist
+            rm -rf $BASE/web/web
             
             echo ">>> Extracting..."
             cd /tmp && tar -xzvf deploy.tar.gz -C $BASE
